@@ -1,15 +1,24 @@
 #include <ros/ros.h>
 
-#include "libAdd.h"
+#include "ros_matlab/libAdd.h"
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-  //初始化， 在C++调用matlab时，必须要进行初始化。  
-  if (!libAddInitialize()) {
-    printf("Could not initialize !");
+  ros::init(argc, argv, "ros_matlab");
+  
+  // Initialize the MATLAB Compiler Runtime global state
+  if (!mclInitializeApplication(NULL, 0)) {
+    ROS_ERROR("Could not initialize the application properly.");
     return -1;
   }
+
+  // Initialize the Vigenere library
+  if (!libAddInitialize()) {
+    ROS_ERROR("Could not initialize the library properly.");
+    return -1;
+  }
+
   double a[3] = {1, 2, 3};
   mwArray m_a(3, 1, mxDOUBLE_CLASS);
   m_a.SetData(a, 3);
@@ -17,7 +26,14 @@ int main(int argc, char* argv[]) {
   mwArray m_b(3, 1, mxDOUBLE_CLASS);
   m_b.SetData(b, 3);
   mwArray result;
-  add(3, result, m_b, m_b);
+
+  // Call matlab function
+  add(1, result, m_a, m_b);
+  std::cout << result << std::endl;
+
+  // Shut down the library and the application global state.
   libAddTerminate();
+  mclTerminateApplication();
+
   return 0;
 }

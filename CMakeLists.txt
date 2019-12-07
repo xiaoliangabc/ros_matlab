@@ -13,21 +13,20 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 )
 
+## MATLAB runtime dir
+set(MATLAB_DIR /usr/local/MATLAB/R2019a/)
+
 ## Specify additional locations of header files
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${MATLAB_DIR}extern/include/
 )
 
-
-set(MATLAB_ROOT /usr/local/MATLAB/R2019a/)
-include_directories(${MATLAB_ROOT}extern/include/)
-LINK_DIRECTORIES(${MATLAB_ROOT}runtime/glnxa64/)
-
 ## Declare a C++ executable
-add_executable(ros_matlab src/main.cc src/libAdd.cpp)
+add_executable(ros_matlab src/main.cc)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ros_matlab ${catkin_LIBRARIES})
-target_link_libraries(ros_matlab -lmwmclmcrrt)
-target_link_libraries(ros_matlab ${PROJECT_SOURCE_DIR}/src/libAdd.so)
+target_link_libraries(ros_matlab ${MATLAB_DIR}runtime/glnxa64/libmwmclmcrrt.so)
+target_link_libraries(ros_matlab ${PROJECT_SOURCE_DIR}/lib/libAdd.so)
